@@ -1,11 +1,11 @@
-var window.ip = "192.168.0.100";
-var window.port = "8008";
-var window.username = "popcorn";
-var window.username = "password";
+var ip = "192.168.0.100";
+var port = "8008";
+var username = "popcorn";
+var username = "password";
 
 $(function() { // -----------------------------------------------------------------------
 
-  callPopcornApi();
+  callPopcornApi("getviewstack");
 
 }); // ----------------------------------------------------------------------------------
 

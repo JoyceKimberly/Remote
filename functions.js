@@ -1,7 +1,7 @@
 var ip = "192.168.0.100";
 var port = "8008";
 var username = "popcorn";
-var username = "password";
+var password = "popcorn";
 
 $(function() { // -----------------------------------------------------------------------
 

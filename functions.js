@@ -26,7 +26,6 @@ function callPopcornApi(method, params) {       //popcorn api wrapper
     type: 'POST',
     url: 'http://' + window.ip + ':' + window.port,
     data: JSON.stringify(request),
-    //dataType: 'json',
     beforeSend: function(xhr) {
       xhr.setRequestHeader('Authorization', window.btoa(window.username + ":" + window.password));
     },

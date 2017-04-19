@@ -9,19 +9,18 @@ $(function() { // --------------------------------------------------------------
 
 }); // ----------------------------------------------------------------------------------
 
-function callPopcornApi(method, params) {       //popcorn api wrapper
-  
+function callPopcornApi(method, params) { 
   if ( typeof params === "undefined" ) {
     params = [];
   };
-  
+
   var request = {};
 
   request.params = params;
   request.id = 10;
   request.method = method;
   request.jsonrpc = "2.0";
-  
+
   $.ajax({
     type: 'POST',
     url: 'http://' + window.ip + ':' + window.port,
@@ -33,5 +32,4 @@ function callPopcornApi(method, params) {       //popcorn api wrapper
       console.log(data);
     },    
   });
-
 };

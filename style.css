@@ -1,0 +1,16 @@
+---
+---
+a {
+  outline: none !important;
+  text-decoration: none !important;
+}
+:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+::-moz-focus-inner {
+  border: 0 !important;
+}
+.hidden {
+  display: none;
+}

@@ -1,20 +1,141 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://rawgit.com/thomaspark/bootswatch/v4/cyborg/bootstrap.min.css">
-    <script type="text/javascript" src="https://getfirebug.com/firebug-lite-debug.js"></script>
-    <link rel="stylesheet" href="style.css">
-    <script type="text/javascript" src="functions.js"></script>
-  </head>
-  <body>
-    Test
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Remote</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/dist/css/bootstrap-theme.css">
+	<link rel="stylesheet" type="text/css" href="vendor/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="css/animation.css">
+  <link rel="stylesheet" type="text/css" href="themes/Official_-_FlaX_theme.css">
+  <script type="text/javascript" src="functions.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <div class="main-window-region">
+    <div id="main-window">
+      <header id="header"></header>
+      <div class="notification_alert" style="display:none"></div>
+      <div id="notification"></div>
+      <div id="content">
+        <div id="main-browser">
+          <div class="filter-bar-region">
+            <div class="filter-bar">
+              <ul class="nav nav-hor left">
+                <li class="source movieTabShow providerinfo" data-toggle="tooltip" data-placement="top" title="movie">Movies</li>
+                <li class="source tvshowTabShow providerinfo" data-toggle="tooltip" data-placement="top" title="tvshow">Series</li>
+              </ul>
+
+              <ul id="nav-filters" class="nav nav-hor filters">
+                <li style="display:none" class="dropdown filter types">
+                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    Type
+                    <span class="value" data-value=""></span>
+                    <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a href="#" data-value=""></a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="dropdown filter genres">
+                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    Genre
+                    <span data-value="" class="value"></span>
+                    <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a href="#" data-value=""></a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="dropdown filter sorters">
+                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    Sort by
+                    <span data-value="" class="value"></span>
+                    <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a href="#" data-value=""></a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+
+              <ul class="nav nav-hor right">
+                <li>
+                  <div class="right search">
+                    <form>
+                      <input id="searchbox" type="text" placeholder="Search" autocomplete="off">
+                      <div class="clear fa fa-times"></div>
+                    </form>
+                  </div>
+                </li>
+
+                <!-- Randomize -->
+                <li style="display:none">
+                  <i id="filterbar-random" class="fa fa-random tooltipped" data-toggle="tooltip" data-placement="bottom" title="Randomize"></i>
+                </li>
+
+                <!-- Watchlist -->
+                <li style="display:block">
+                  <i id="filterbar-watchlist" class="fa fa-inbox watchlist tooltipped" data-toggle="tooltip" data-placement="bottom" title="Watchlist"></i>
+                </li>
+
+                <!-- Favorites -->
+                <li>
+                  <i id="filterbar-favorites" class="fa fa-heart favorites tooltipped" data-toggle="tooltip" data-placement="bottom" title="Favorites"></i>
+                </li>
+
+                <!-- Torrent Collection -->
+                <li id="torrent_col" style="display:block">
+                  <i id="filterbar-torrent-collection" class="fa fa-folder-open torrent-collection tooltipped" data-toggle="tooltip" data-placement="bottom"
+                    title="Torrent Collection"></i>
+                </li>
+
+                <!-- About -->
+                <li>
+                  <i id="filterbar-about" class="fa fa-info-circle about tooltipped" data-toggle="tooltip" data-placement="bottom" title="About"></i>
+                </li>
+
+                <!-- Settings -->
+                <li>
+                  <i id="filterbar-settings" class="fa fa-cog settings tooltipped" data-toggle="tooltip" data-placement="left" title="Settings"></i>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="list-region">
+            <div class="list">
+              <div class="spinner" style="display:none">
+                <div class="loading-container">
+                  <div class="ball"></div>
+                  <div class="ball1"></div>
+                </div>
+              </div>
+              <div class="items">
+                <ul class="show"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="settings-container"></div>
+      <div id="movie-detail"></div>
+      <div id="torrent-collection-container"></div>
+    </div>
+  </div>
+</body>
+
 </html>

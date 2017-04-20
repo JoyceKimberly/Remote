@@ -126,14 +126,147 @@
               </div>
               <div class="items">
                 <ul class="show"></ul>
+                <ul class="movie"></ul>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+      <div id="shows-container">
+        <div class="shows-container-contain">
+          <div class="show-detail-container">
+            <div class="fa fa-times close-icon"></div>
+            <section class="show-header">
+              <div class="sh-cover">
+                <div class="shc-img" data-bgr="<%= images.fanart %>"></div>
+              </div>
+              <div class="sh-poster">
+                <div class="shp-img" data-bgr="<%= images.poster %>"></div>
+              </div>
+              <div class="sh-metadata">
+                <div class="shm-title"></div>
+                <div class="shm-infos">
+                  <div class="shmi-year"></div>
+                  <span class="dot"></span>
+                  <div class="shmi-runtime"></div>
+                  <span class="dot"></span>
+                  <div class="shmi-status"></div>
+                  <span class="dot"></span>
+                  <div class="shmi-genre"></div>
+                  <span class="dot"></span>
+                  <div class="shmi-imdb" data-toggle="tooltip" data-placement="top" title="Open IMDb page"></div>
+                  <span class="dot"></span>
+                  <div class="shmi-rating">
+                    <div data-toggle="tooltip" data-placement="right" title="<%= Math.round(rating.percentage) / 10 %>/10" class="star-container-tv">
+                      <i class="fa fa-star rating-star"></i>
+                      <span class="fa-stack rating-star-half-container">
+                        <i class="fa fa-star fa-stack-1x rating-star-half-empty"></i>
+                        <i class="fa fa-star-half fa-stack-1x rating-star-half"></i>
+                      </span>
+                      <i class="fa fa-star rating-star-empty"></i>
+                    </div>
+                    <div class="number-container-tv hidden"><em>/10</em></div>
+                  </div>
+                </div>
+                <div class="shm-synopsis"></div>
+              </div>
+              <div class="sh-actions">
+                <div class="sha-bookmark">Add to bookmarks</div>
+                <div class="sha-watched">Mark as Seen</div>
+              </div>
+            </section>
+            <section class="show-details">
+              <div class="sd-seasons">
+                <div class="sds-title">Seasons</div>
+                <div class="sds-list">
+                  <ul></ul>
+                </div>
+              </div>
+              <div class="sd-episodes">
+                <div class="sde-title">Episodes</div>
+                <div class="sde-list"></div>
+              </div>
+              <div class="sd-overview">
+                <div class="sdo-infos">
+                  <div class="sdoi-title"></div>
+                  <div class="sdoi-links">
+                    <div data-toggle="tooltip" data-placement="left" title="Magnet link" class="fa fa-magnet magnet-icon"></div>
+                    <div data-toggle="tooltip" data-placement="left" title="Health Unknown" class="fa fa-circle health-icon None"></div>
+                  </div>
+                  <div class="sdoi-aired">
+                    <div class="sdoi-number"></div>
+                    <div class="sdoi-date"></div>
+                  </div>
+                  <div class="sdoi-synopsis"></div>
+                </div>
+                <div class="sdo-watch">
+                  <div class="sdow-quality">
+                    <div id="q480" class="q480">480p</div>
+                    <div id="q720" class="q720">720p</div>
+                    <div id="q1080" class="q1080">1080p</div>
+                  </div>
+                  <div class="sdow-watchnow">
+                    <div class="button dropup" id="player-chooser"></div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
       </div>
       <div id="settings-container"></div>
       <div id="movie-detail"></div>
       <div id="torrent-collection-container"></div>
+      <div class="app-overlay">
+        <div class="loading">
+          <div class="loading-background"></div>
+          <div class="loading-background-overlay"></div>
+
+          <div class="state">
+            <div class="title"></div>
+            <div class="external-play" style="visibility:hidden">
+              Streaming to <span class="player-name"></span></div>
+            <!-- download -->
+            <div class="text_download"></div>
+
+            <div class="seed_status">
+              <!-- loading bar -->
+              <div class="loading-progressbar">
+                <div id="loadingbar-contents"></div>
+              </div>
+
+              <!-- downloading info -->
+              <div class="loading-info">
+                <span class="buffer_percent"></span><br><br>
+                <span class="loading-info-text">Download:&nbsp;</span>
+                <span class="download_speed value"></span><br>
+                <span class="loading-info-text">Upload:&nbsp;</span>
+                <span class="upload_speed value"></span><br>
+                <span class="loading-info-text">Active Peers:&nbsp;</span>
+                <span class="value_peers value">0</span>
+              </div>
+            </div>
+            <div class="player-controls" style="visibility:hidden">
+              <i class="fa fa-backward backward"></i>
+              <i class="fa fa-pause pause"></i>
+              <i class="fa fa-stop stop"></i>
+              <i class="fa fa-forward forward"></i>
+            </div>
+            <div class="playing-progressbar" style="visibility:hidden">
+              <div id="playingbar-contents"></div>
+            </div>
+            <div class="cancel-button" style="visibility:hidden">
+              <div class="cancel-button-text">
+                Cancel
+              </div>
+            </div>
+          </div>
+          <div class="warning-nospace">
+            <span class="warn">Your disk is almost full.</span><br>
+            <span class="detail">You need to make more space available on your disk by deleting files.</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>

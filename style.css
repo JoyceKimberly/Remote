@@ -34,6 +34,18 @@ a {
 .item .cover {
   opacity: 1;
 }
-.item:hover .cover .cover-overlay {
+.item:hover .cover .cover-overlay, 
+.item:focus .cover .cover-overlay {
   opacity: 1;
 }
+
+.shmi-status {
+  text-transform: capitalize;
+}
+
+.app-overlay {
+  display: none;
+}
+
+#header { z-index: 999; }
+.loading { z-index: 99; }

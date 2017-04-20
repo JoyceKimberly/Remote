@@ -8,11 +8,11 @@ var currentlist = {};
 
 $(function() { // -----------------------------------------------------------------------
 
-  checkConnected(true); 
-	Popcorn("getviewstack");
+  checkConnected(true);
   Popcorn("getcurrentlist");
-	//setInterval( function() {
-  //}, 1000);
+	setInterval( function() {
+    Popcorn("getviewstack");
+  }, 1000);
 
   function Popcorn(method, params) { 
     if ( typeof params === "undefined" ) {
@@ -33,9 +33,9 @@ $(function() { // --------------------------------------------------------------
         xhr.setRequestHeader("Authorization", btoa(username + ":" + password));
       },
       success: function(data, textStatus) {
-        console.log(data.result);
-        switch (request.method) { 
-      
+        //console.log(data.result);
+        switch (request.method) {
+
           case "getviewstack":
             viewstackhandler(data);
             break;
@@ -47,9 +47,9 @@ $(function() { // --------------------------------------------------------------
             currentlist[type] = {
               pages: pages
             };
-            $.each(data.result.list, function(key, obj) {
+            $.each(data.result.list, function(index, obj) {
               $(".items ul." + type).append('\
-                <li id="' + obj._id + '" class="item">\
+                <li id="' + obj._id + '" data-index="' + index + '" class="item">\
                   <img class="cover-image" src="' + obj.images.poster + '">\
                   <div class="cover">\
                     <div class="cover-overlay">\
@@ -64,19 +64,64 @@ $(function() { // --------------------------------------------------------------
             });
             break;
       
-          case "getloading":
+          case "getselection":
+            //if (view === "shows-container-contain") { 
+              var $showsContainer = $("#shows-container");
+              $showsContainer.find(".shm-title").html(data.result.title);
+              $showsContainer.find(".shmi-year").html(data.result.year);
+              $showsContainer.find(".shmi-runtime").html(data.result.runtime + " min");
+              if (data.result.status != null) {
+                $showsContainer.find(".shmi-status").html(data.result.status);
+              } else { 
+                $showsContainer.find(".shmi-status").html('("N/A")');
+              };
+              $showsContainer.find(".shm-synopsis").html(data.result.synopsis);
+
+              $showsContainer.find(".sds-list ul").html("");              
+              $showsContainer.find(".sde-list").html("");              
+              $.each(data.result.torrents, function(key, obj) { 
+                $showsContainer.find(".sds-list ul").append('\
+                  <li class="tab-season" data-tab="season-' + key + '">\
+                    <a>Season ' + key + '</a>\
+                  </li>\
+                ');
+                $showsContainer.find(".sde-list").append('\
+                  <div class="tab-episodes season-' + key + '"><ul></ul></div>\
+                ');
+                $.each(data.result.torrents[key], function(key2, obj2) { 
+                  $showsContainer.find(".sde-list .season-" + key + " ul").append('\
+                    <li class="tab-episode" data-tab="episode-' + key2 + '" data-id="' + obj2.tvdb_id + '">\
+                      <a href="#" class="episodeData">\
+                        <span>' + obj2.episode + '</span>\
+                        <div>' + obj2.title + '</div>\
+                      </a>\
+                      <i id="watched-' + key + '-' + obj2.episode + '" class="fa fa-eye watched"></i>\
+                    </li>\
+                  ');
+                });
+              });
+              $showsContainer.find(".sd-overview .sdoi-title").html(data.result.selectedEpisode.title); 
+              $showsContainer.find(".sd-overview .sdoi-number").html("Season " + data.result.selectedEpisode.season + ", Episode " + data.result.selectedEpisode.episode); 
+              $showsContainer.find(".sd-overview .sdoi-date").html("Aired Date: " + data.result.selectedEpisode.first_aired); 
+              $showsContainer.find(".sd-overview .sdoi-synopsis").html(data.result.selectedEpisode.overview); 
             
+              $showsContainer.find('.tab-season[data-tab="season-' + data.result.selectedEpisode.season + '"]').addClass("active");
+              $showsContainer.find('.tab-episode[data-tab="episode-' + data.result.selectedEpisode.episode + '"]').addClass("active");
+              $showsContainer.find(".tab-episodes").hide();
+              $showsContainer.find(".tab-episodes.season-" + data.result.selectedEpisode.season).show();
+            //};  
+            $(".app-overlay .loading-background").css("background-image", "url('" + data.result.images.fanart + "')");
+            break;
+      
+          case "getloading":
+            $(".app-overlay .title").html(data.result.title);
+            $(".app-overlay .download_speed").html(data.result.downloadSpeed);
+            $(".app-overlay .upload_speed").html(data.result.uploadSpeed);
+            $(".app-overlay .value_peers").html(data.result.activePeers);
             break;
         };
       },
     });
-  };
-
-  function showsBrowser() { 
-    $(".items ul.show").html("");
-    for (var i = 1; i <= currentlist.show.pages; i++) { 
-      Popcorn("getcurrentlist", i);
-    };
   };
 
   function viewstackhandler(data) {	
@@ -85,11 +130,15 @@ $(function() { // --------------------------------------------------------------
     };
     currentview = data.result.viewstack[data.result.viewstack.length - 1];
 
-    if ( view !== currentview /*&& $("#settings").is(":visible") == false*/ ) { 
+    //if ( view !== currentview /*&& $("#settings").is(":visible") == false*/ ) { 
       switch (currentview) {
         
         case "main-browser":
-          Popcorn("getcurrentlist");
+          $(".items ul.show").html("");
+          for (var i = 1; i <= currentlist.show.pages; i++) { 
+            Popcorn("getcurrentlist", i);
+          };
+          $(".app-overlay").hide();
           break;
       
         case "shows-container-contain":
@@ -109,14 +158,22 @@ $(function() { // --------------------------------------------------------------
         case "app-overlay":
           Popcorn("getloading");
           Popcorn("getselection");
+          //$(".app-overlay").show();
           break;
       
         default:
           console.debug("Current view: " + currentview);
       };
       view = currentview;
-    };
+    //};
   };
+
+  $(".items").on("click", "li.item", function() {
+    var $dit = $(this);
+    Popcorn("setselection", $dit.data("index"));
+    Popcorn("enter");
+    Popcorn("getselection");
+  });
 
   function checkConnected(warning) {
     var request = {};

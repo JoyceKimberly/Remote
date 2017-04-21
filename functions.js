@@ -4,13 +4,13 @@ var username = "popcorn";
 var password = "popcorn";
 var connected = false;
 var view = "";
-var currentlist = {};
+var pages = 0;
+var scroll = 0;
 
 $(function() { // -----------------------------------------------------------------------
 
   checkConnected(true);
-  Popcorn("getcurrentlist");
-	setInterval( function() {
+  setInterval(function () {
     Popcorn("getviewstack");
   }, 1000);
 
@@ -36,20 +36,34 @@ $(function() { // --------------------------------------------------------------
         //console.log(data.result);
         switch (request.method) {
 
+          case "enter":
+            Popcorn("getviewstack");
+            break;
+      
           case "getviewstack":
             viewstackhandler(data);
             break;
-      
+           
           case "getcurrentlist":
             var type = data.result.type;
-            var pages = data.result.max_page;
-            var page = data.result.page;
-            currentlist[type] = {
-              pages: pages
+            pages = data.result.max_page;
+            if (type === undefined) { 
+              Popcorn("getviewstack");
+              break;
             };
             $.each(data.result.list, function(index, obj) {
-              $(".items ul." + type).append('\
-                <li id="' + obj._id + '" data-index="' + index + '" class="item">\
+              var watched = false;
+              if (type === "show") {
+                watched = !obj.watched;
+                $("#main-browser .movieTabShow").removeClass("active");
+                $("#main-browser .tvshowTabShow").addClass("active");
+              } else { 
+                watched = obj.watched;
+                $("#main-browser .tvshowTabShow").removeClass("active");
+                $("#main-browser .movieTabShow").addClass("active");
+              };
+              $(".list .items_" + type).append('\
+                <li id="' + obj._id + '" class="item' + (watched ? " watched" : "") + '" data-index="' + index + '">\
                   <img class="cover-image" src="' + obj.images.poster + '">\
                   <div class="cover">\
                     <div class="cover-overlay">\
@@ -59,58 +73,81 @@ $(function() { // --------------------------------------------------------------
                   </div>\
                   <p class="title" title="' + obj.slug + '">' + obj.title + '</p>\
                   <p class="year">' + obj.year + '</p>\
+                  <p class="seasons">' + (obj.rating.percentage ? (obj.rating.percentage/10) : obj.rating) + '/10</p>\
                 </li>\
               ');
             });
+            $(".list").scrollTop(scroll);
             break;
       
           case "getselection":
-            //if (view === "shows-container-contain") { 
-              var $showsContainer = $("#shows-container");
-              $showsContainer.find(".shm-title").html(data.result.title);
-              $showsContainer.find(".shmi-year").html(data.result.year);
-              $showsContainer.find(".shmi-runtime").html(data.result.runtime + " min");
-              if (data.result.status != null) {
-                $showsContainer.find(".shmi-status").html(data.result.status);
-              } else { 
-                $showsContainer.find(".shmi-status").html('("N/A")');
-              };
-              $showsContainer.find(".shm-synopsis").html(data.result.synopsis);
+            switch (view) { 
 
-              $showsContainer.find(".sds-list ul").html("");              
-              $showsContainer.find(".sde-list").html("");              
-              $.each(data.result.torrents, function(key, obj) { 
-                $showsContainer.find(".sds-list ul").append('\
-                  <li class="tab-season" data-tab="season-' + key + '">\
-                    <a>Season ' + key + '</a>\
-                  </li>\
-                ');
-                $showsContainer.find(".sde-list").append('\
-                  <div class="tab-episodes season-' + key + '"><ul></ul></div>\
-                ');
-                $.each(data.result.torrents[key], function(key2, obj2) { 
-                  $showsContainer.find(".sde-list .season-" + key + " ul").append('\
-                    <li class="tab-episode" data-tab="episode-' + key2 + '" data-id="' + obj2.tvdb_id + '">\
-                      <a href="#" class="episodeData">\
-                        <span>' + obj2.episode + '</span>\
-                        <div>' + obj2.title + '</div>\
-                      </a>\
-                      <i id="watched-' + key + '-' + obj2.episode + '" class="fa fa-eye watched"></i>\
+              case "shows-container-contain":
+                var $showsContainer = $("#shows-container");
+                $showsContainer.find(".shm-title").html(data.result.title);
+                $showsContainer.find(".shmi-year").html(data.result.year);
+                $showsContainer.find(".shmi-runtime").html(data.result.runtime + " min");
+                $showsContainer.find(".shmi-status").html(data.result.status ? data.result.status : "N/A");
+                $showsContainer.find(".shmi-genre").html(data.result.genres[0]);
+                $showsContainer.find(".shmi-rating .number-container-tv").html((data.result.rating.percentage/10) + "/10");
+                $showsContainer.find(".shm-synopsis").html(data.result.synopsis);
+
+                $showsContainer.find(".sds-list ul").html("");              
+                $showsContainer.find(".sde-list").html("");              
+                $.each(data.result.torrents, function(key, obj) { 
+                  $showsContainer.find(".sds-list ul").append('\
+                    <li class="tab-season" data-tab="season-' + key + '" data-season="' + key + '">\
+                      <a>Season ' + key + '</a>\
                     </li>\
                   ');
+                  $showsContainer.find(".sde-list").append('\
+                    <div class="tab-episodes season-' + key + '"><ul></ul></div>\
+                  ');
+                  $.each(data.result.torrents[key], function(key2, obj2) { 
+                    $showsContainer.find(".sde-list .season-" + key + " ul").append('\
+                      <li class="tab-episode" data-tab="episode-' + key2 + '" data-id="' + obj2.tvdb_id + '" data-season="' + key + '" data-episode="' + key2 + '">\
+                        <a href="#" class="episodeData">\
+                          <span>' + obj2.episode + '</span>\
+                          <div>' + obj2.title + '</div>\
+                        </a>\
+                        <i id="watched-' + key + '-' + obj2.episode + '" class="fa fa-eye watched"></i>\
+                      </li>\
+                    ');
+                  });
                 });
-              });
-              $showsContainer.find(".sd-overview .sdoi-title").html(data.result.selectedEpisode.title); 
-              $showsContainer.find(".sd-overview .sdoi-number").html("Season " + data.result.selectedEpisode.season + ", Episode " + data.result.selectedEpisode.episode); 
-              $showsContainer.find(".sd-overview .sdoi-date").html("Aired Date: " + data.result.selectedEpisode.first_aired); 
-              $showsContainer.find(".sd-overview .sdoi-synopsis").html(data.result.selectedEpisode.overview); 
-            
-              $showsContainer.find('.tab-season[data-tab="season-' + data.result.selectedEpisode.season + '"]').addClass("active");
-              $showsContainer.find('.tab-episode[data-tab="episode-' + data.result.selectedEpisode.episode + '"]').addClass("active");
-              $showsContainer.find(".tab-episodes").hide();
-              $showsContainer.find(".tab-episodes.season-" + data.result.selectedEpisode.season).show();
-            //};  
-            $(".app-overlay .loading-background").css("background-image", "url('" + data.result.images.fanart + "')");
+                $showsContainer.find(".sd-overview .sdoi-title").html(data.result.selectedEpisode.title); 
+                $showsContainer.find(".sd-overview .sdoi-number").html("Season " + data.result.selectedEpisode.season + ", Episode " + data.result.selectedEpisode.episode); 
+                $showsContainer.find(".sd-overview .sdoi-date").html("Aired Date: " + data.result.selectedEpisode.first_aired); 
+                $showsContainer.find(".sd-overview .sdoi-synopsis").html(data.result.selectedEpisode.overview); 
+              
+                $showsContainer.find('.tab-season[data-tab="season-' + data.result.selectedEpisode.season + '"]').addClass("active");
+                $showsContainer.find('.tab-episode[data-tab="episode-' + data.result.selectedEpisode.episode + '"]').addClass("active");
+                $showsContainer.find(".tab-episodes").hide();
+                $showsContainer.find(".tab-episodes.season-" + data.result.selectedEpisode.season).show();
+                $(".app-overlay .loading-background").css("background-image", "url('" + data.result.images.fanart + "')");
+                break;
+              
+              case "movie-detail":
+                var $movieContainer = $("#movie-detail");
+                $movieContainer.find(".backdrop").css("background-image", "url('" + data.result.backdrop + "')").css("opacity", 1);
+                $movieContainer.find(".poster-box img").attr("src", data.result.cover).css("opacity", 1);
+                $movieContainer.find(".title").html(data.result.title);
+                $movieContainer.find(".year").html(data.result.year);
+                $movieContainer.find(".runtime").html(data.result.runtime + " min");
+                $movieContainer.find(".genre").html("");
+                $.each(data.result.genre, function(index, value) {
+                  $movieContainer.find(".genre").append(value + '<span class="divider"> / </span>');
+                });
+                $movieContainer.find(".rating-container .number-container").html(data.result.rating + "/10");
+                $movieContainer.find(".overview").html(data.result.synopsis);
+                if (data.result.watched) {
+                  $movieContainer.find(".watched-toggle").addClass("selected").html("Seen");
+                } else { 
+                  $movieContainer.find(".watched-toggle").removeClass("selected").html("Not Seen");
+                };
+                break;
+            };  
             break;
       
           case "getloading":
@@ -125,28 +162,35 @@ $(function() { // --------------------------------------------------------------
   };
 
   function viewstackhandler(data) {	
+    if (!connected) { return false; };
     if ( typeof(data.result.butterVersion) === "undefined" ) { 
       return false;
     };
     currentview = data.result.viewstack[data.result.viewstack.length - 1];
 
-    //if ( view !== currentview /*&& $("#settings").is(":visible") == false*/ ) { 
+    if ( view !== currentview /*&& $("#settings").is(":visible") == false*/ ) { 
       switch (currentview) {
         
         case "main-browser":
-          $(".items ul.show").html("");
-          for (var i = 1; i <= currentlist.show.pages; i++) { 
-            Popcorn("getcurrentlist", i);
-          };
-          $(".app-overlay").hide();
+          $(".list .items_show, .list .items_movie").html("");
+          Popcorn("getcurrentlist");
+          $(".spinner, .app-overlay, #shows-container, #movie-detail").hide();
+          $("#main-browser .items").show();
           break;
       
         case "shows-container-contain":
           Popcorn("getselection");
+          $(".spinner, #movie-detail, .app-overlay").hide();
+          $("#shows-container").show();
           break;
       
         case "movie-detail":
           Popcorn("getselection");
+          $(".spinner, .app-overlay, #shows-container").hide();
+          $("#movie-detail").show();
+          break;
+      
+        case "torrent-collection":
           break;
       
         case "player":
@@ -158,21 +202,79 @@ $(function() { // --------------------------------------------------------------
         case "app-overlay":
           Popcorn("getloading");
           Popcorn("getselection");
-          //$(".app-overlay").show();
+          $(".spinner, #main-browser .items, #shows-container, #movie-detail").hide();
+          $(".app-overlay").show();
           break;
+
+        case "notificationWrapper":
+          //console.log(data);  
+        break;
       
         default:
           console.debug("Current view: " + currentview);
       };
       view = currentview;
-    //};
+    };
+
+    if (currentview === "app-overlay") { 
+      Popcorn("getloading");
+    };
   };
 
-  $(".items").on("click", "li.item", function() {
+  $(".filter-bar").on("click", ".source", function() { 
     var $dit = $(this);
-    Popcorn("setselection", $dit.data("index"));
+    if ($dit.is(".movieTabShow")) { 
+      Popcorn("movieslist");
+    } else if ($dit.is(".tvshowTabShow")) { 
+      Popcorn("showslist");
+    };
+    view = "";
+    Popcorn("getviewstack");
+  });
+
+  $(".items").on("mouseenter", "li.item", function() {
+    var $dit = $(this);
+    var params = [$dit.data("index").toString()];
+    Popcorn("setselection", params);
+  })
+  .on("click", "li.item", function() {
+    var $dit = $(this);
+    var params = [$dit.data("index").toString()];
+    Popcorn("setselection", params);
     Popcorn("enter");
-    Popcorn("getselection");
+    view = "";
+    Popcorn("getviewstack");
+  });
+
+  $("#shows-container").on("click", ".tab-season", function() {
+    var $dit = $(this);
+    var params = [$dit.data("season"), 1];
+    Popcorn("selectepisode", params);
+    view = "";
+    Popcorn("getviewstack");
+  })
+  .on("click", ".tab-episode", function() {
+    var $dit = $(this);
+    var params = [$dit.data("season"), $dit.data("episode")];
+    Popcorn("selectepisode", params);
+    view = "";
+    Popcorn("getviewstack");
+  })
+  .on("click", ".sdow-watchnow", function() {
+    Popcorn("enter");
+  });
+  
+  $("#movie-detail").on("click", "#player-chooser", function() {
+    Popcorn("enter");
+  });
+
+  $(".list").on("scroll", function () { 
+    var $dit = $(this);
+    scroll = $dit.scrollTop();
+    if ($dit.scrollTop() + $dit.innerHeight() >= $dit[0].scrollHeight) {
+      view = "";
+      Popcorn("getviewstack");
+    };
   });
 
   function checkConnected(warning) {

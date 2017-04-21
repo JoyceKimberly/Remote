@@ -22,6 +22,13 @@ a {
   top: 30px;
 }
 
+.list .items_show,
+.list .items_movie {
+  padding-top: 0;
+  width: calc(100% - 5px);
+  background: transparent;
+}
+
 .item {
   position: relative;
 }
@@ -43,6 +50,13 @@ a {
   text-transform: capitalize;
 }
 
+.divider:last-of-type {
+  display: none;
+}
+
+#main-browser .items,
+#shows-container,
+#movie-detail,
 .app-overlay {
   display: none;
 }

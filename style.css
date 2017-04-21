@@ -63,3 +63,7 @@ a {
 
 #header { z-index: 999; }
 .loading { z-index: 99; }
+
+#playingbar-contents {
+  width: 0%;
+}

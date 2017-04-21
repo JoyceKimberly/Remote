@@ -44,13 +44,24 @@ $(function() { // --------------------------------------------------------------
             viewstackhandler(data);
             break;
            
+          case "getgenres":
+            console.log(data.result.genres);  
+            break;
+           
+          case "getsorters":
+            console.log(data.result.sorters);  
+            break;
+           
           case "getcurrentlist":
-            var type = data.result.type;
+            var type = "";
             pages = data.result.max_page;
-            if (type === undefined) { 
+            if (data.result.type === undefined) {
               Popcorn("getviewstack");
               break;
+            } else { 
+              type = data.result.type;
             };
+            $(".list .items_show, .list .items_movie").html("");
             $.each(data.result.list, function(index, obj) {
               var watched = false;
               if (type === "show") {
@@ -85,6 +96,8 @@ $(function() { // --------------------------------------------------------------
 
               case "shows-container-contain":
                 var $showsContainer = $("#shows-container");
+                $showsContainer.find(".sh-cover .shc-img").css("background-image", "url('" + data.result.images.fanart + "')").css("opacity", 1);
+                $showsContainer.find(".sh-poster .shp-img").css("background-image", "url('" + data.result.images.poster + "')").css("opacity", 1);
                 $showsContainer.find(".shm-title").html(data.result.title);
                 $showsContainer.find(".shmi-year").html(data.result.year);
                 $showsContainer.find(".shmi-runtime").html(data.result.runtime + " min");
@@ -125,7 +138,6 @@ $(function() { // --------------------------------------------------------------
                 $showsContainer.find('.tab-episode[data-tab="episode-' + data.result.selectedEpisode.episode + '"]').addClass("active");
                 $showsContainer.find(".tab-episodes").hide();
                 $showsContainer.find(".tab-episodes.season-" + data.result.selectedEpisode.season).show();
-                $(".app-overlay .loading-background").css("background-image", "url('" + data.result.images.fanart + "')");
                 break;
               
               case "movie-detail":
@@ -147,14 +159,29 @@ $(function() { // --------------------------------------------------------------
                   $movieContainer.find(".watched-toggle").removeClass("selected").html("Not Seen");
                 };
                 break;
-            };  
+            };
+            $(".app-overlay .loading-background").css("background-image", "url('" + (data.result.backdrop ? data.result.backdrop : data.result.images.fanart) + "')");
             break;
       
+          case "getplaying":
+            var $appOverlay = $(".app-overlay");
+            $appOverlay.find(".title").html(data.result.title);
+            $appOverlay.find(".download_speed").html(data.result.downloadSpeed);
+            $appOverlay.find(".upload_speed").html(data.result.uploadSpeed);
+            $appOverlay.find(".value_peers").html(data.result.activePeers);
+            var percentage = (data.result.currentTime / data.result.duration) * 100;
+            $appOverlay.find(".playing-progressbar").css("visibility", "visible");
+            $appOverlay.find("#playingbar-contents").css("width", percentage + "%");
+            break;
+
           case "getloading":
-            $(".app-overlay .title").html(data.result.title);
-            $(".app-overlay .download_speed").html(data.result.downloadSpeed);
-            $(".app-overlay .upload_speed").html(data.result.uploadSpeed);
-            $(".app-overlay .value_peers").html(data.result.activePeers);
+            var $appOverlay = $(".app-overlay");
+            $appOverlay.find(".title").html(data.result.title);
+            $appOverlay.find(".buffer_percent").html((data.result.bufferPercent ? data.result.bufferPercent : "100") + "%");
+            $appOverlay.find(".download_speed").html(data.result.downloadSpeed);
+            $appOverlay.find(".upload_speed").html(data.result.uploadSpeed);
+            $appOverlay.find(".value_peers").html(data.result.activePeers);
+            $appOverlay.find(".playing-progressbar").css("visibility", "hidden");
             break;
         };
       },
@@ -172,8 +199,9 @@ $(function() { // --------------------------------------------------------------
       switch (currentview) {
         
         case "main-browser":
-          $(".list .items_show, .list .items_movie").html("");
           Popcorn("getcurrentlist");
+          Popcorn("getgenres");
+          Popcorn("getsorters");
           $(".spinner, .app-overlay, #shows-container, #movie-detail").hide();
           $("#main-browser .items").show();
           break;
@@ -194,9 +222,10 @@ $(function() { // --------------------------------------------------------------
           break;
       
         case "player":
-          Popcorn("getloading");
           Popcorn("getplaying");
-          Popcorn("getsubtitles");
+          Popcorn("getselection");
+          $(".spinner, #main-browser .items, #shows-container, #movie-detail").hide();
+          $(".app-overlay").show();
           break;
       
         case "app-overlay":
@@ -219,7 +248,14 @@ $(function() { // --------------------------------------------------------------
     if (currentview === "app-overlay") { 
       Popcorn("getloading");
     };
+    if (currentview === "player") { 
+      Popcorn("getplaying");
+    };
   };
+
+  $("#header").on("click", ".fullscreen", function() { 
+    Popcorn("togglefullscreen");
+  });
 
   $(".filter-bar").on("click", ".source", function() { 
     var $dit = $(this);
@@ -270,11 +306,17 @@ $(function() { // --------------------------------------------------------------
 
   $(".list").on("scroll", function () { 
     var $dit = $(this);
-    scroll = $dit.scrollTop();
+    if ($dit.scrollTop() > 0) { 
+      scroll = $dit.scrollTop();
+    };
     if ($dit.scrollTop() + $dit.innerHeight() >= $dit[0].scrollHeight) {
       view = "";
       Popcorn("getviewstack");
     };
+  });
+
+  $(".app-overlay").on("click", ".cancel-button", function() {
+    Popcorn("back");
   });
 
   function checkConnected(warning) {
@@ -310,98 +352,6 @@ $(function() { // --------------------------------------------------------------
         connected = false;
       }
     });
-  };
-
-  var lists = {
-    genres: [
-      'All',
-      'Action',
-      'Adventure',
-      'Animation',
-      'Biography',
-      'Comedy',
-      'Crime',
-      'Documentary',
-      'Drama',
-      'Family',
-      'Fantasy',
-      'Film-Noir',
-      'History',
-      'Horror',
-      'Music',
-      'Musical',
-      'Mystery',
-      'Romance',
-      'Sci-Fi',
-      'Short',
-      'Sport',
-      'Thriller',
-      'War',
-      'Western'
-    ],
-
-    sorters: [
-      'trending',
-      'popularity',
-      'last added',
-      'year',
-      'title',
-      'rating'
-    ],
-
-    sorters_tv: [
-      'trending',
-      'popularity',
-      'updated',
-      'year',
-      'name',
-      'rating'
-    ],
-
-    sorters_fav: [
-      'watched items',
-      'year',
-      'title',
-      'rating'
-    ],
-
-    types_fav: [
-      'All',
-      'Movies',
-      'TV',
-      'Anime'
-    ],
-
-    genres_tv: [
-      'All',
-      'Action',
-      'Adventure',
-      'Animation',
-      'Children',
-      'Comedy',
-      'Crime',
-      'Documentary',
-      'Drama',
-      'Family',
-      'Fantasy',
-      'Game Show',
-      'Home and Garden',
-      'Horror',
-      'Mini Series',
-      'Mystery',
-      'News',
-      'Reality',
-      'Romance',
-      'Science Fiction',
-      'Soap',
-      'Special Interest',
-      'Sport',
-      'Suspense',
-      'Talk Show',
-      'Thriller',
-      'Western'
-    ],
-
   };
 
 }); // ----------------------------------------------------------------------------------

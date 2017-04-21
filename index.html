@@ -7,8 +7,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="format-detection" content="telephone=no">
   <link rel="apple-touch-icon" href="images/popcorntime.ico">
   <link rel="shortcut icon" type="image/x-icon" href="images/popcorntime.ico">
@@ -26,7 +27,12 @@
 <body>
   <div class="main-window-region">
     <div id="main-window">
-      <header id="header"></header>
+      <header id="header">
+        <nav class="btn-set fs-darwin">
+          <button class="btn-os fullscreen tooltipped" data-toggle="tooltip" data-placement="right" title="
+            Toggle Fullscreen"></button>
+        </nav>
+      </header>
       <div class="notification_alert" style="display:none"></div>
       <div id="notification"></div>
       <div id="content">
@@ -142,10 +148,10 @@
             <div class="fa fa-times close-icon"></div>
             <section class="show-header">
               <div class="sh-cover">
-                <div class="shc-img" data-bgr="<%= images.fanart %>"></div>
+                <div class="shc-img" data-bgr></div>
               </div>
               <div class="sh-poster">
-                <div class="shp-img" data-bgr="<%= images.poster %>"></div>
+                <div class="shp-img" data-bgr></div>
               </div>
               <div class="sh-metadata">
                 <div class="shm-title"></div>
@@ -284,7 +290,7 @@
 
             <div class="seed_status">
               <!-- loading bar -->
-              <div class="loading-progressbar">
+              <div class="loading-progressbar" style="visibility:hidden">
                 <div id="loadingbar-contents"></div>
               </div>
 
@@ -296,7 +302,7 @@
                 <span class="loading-info-text">Upload:&nbsp;</span>
                 <span class="upload_speed value"></span><br>
                 <span class="loading-info-text">Active Peers:&nbsp;</span>
-                <span class="value_peers value">0</span>
+                <span class="value_peers value"></span>
               </div>
             </div>
             <div class="player-controls" style="visibility:hidden">
@@ -305,10 +311,10 @@
               <i class="fa fa-stop stop"></i>
               <i class="fa fa-forward forward"></i>
             </div>
-            <div class="playing-progressbar" style="visibility:hidden">
+            <div class="playing-progressbar">
               <div id="playingbar-contents"></div>
             </div>
-            <div class="cancel-button" style="visibility:hidden">
+            <div class="cancel-button">
               <div class="cancel-button-text">
                 Cancel
               </div>

@@ -4,8 +4,7 @@ var username = "popcorn";
 var password = "popcorn";
 var connected = false;
 var view = "";
-var pages = 0;
-var scroll = 0;
+var page = 1;
 
 $(function() { // -----------------------------------------------------------------------
 
@@ -33,7 +32,6 @@ $(function() { // --------------------------------------------------------------
         xhr.setRequestHeader("Authorization", btoa(username + ":" + password));
       },
       success: function(data, textStatus) {
-        //console.log(data.result);
         switch (request.method) {
 
           case "enter":
@@ -45,23 +43,34 @@ $(function() { // --------------------------------------------------------------
             break;
            
           case "getgenres":
-            console.log(data.result.genres);  
+            var $dropdown = $("#nav-filters .genres .dropdown-menu");
+            $dropdown.html('<li><a data-value=""></a></li>');
+            $.each(data.result.genres, function(index, value) {
+              $dropdown.append('<li><a data-value="' + value + '">' + value + '</a></li>');
+            });
             break;
            
           case "getsorters":
-            console.log(data.result.sorters);  
+            var $dropdown = $("#nav-filters .sorters .dropdown-menu");
+            $dropdown.html('<li><a data-value=""></a></li>');
+            $.each(data.result.sorters, function(index, value) {
+              $dropdown.append('<li><a data-value="' + value + '">' + value + '</a></li>');
+            });
             break;
            
           case "getcurrentlist":
+            console.log(data.result);  
             var type = "";
-            pages = data.result.max_page;
-            if (data.result.type === undefined) {
+            page = (data.result ? data.result.page : 1);
+            if (data.result === undefined) {
               Popcorn("getviewstack");
               break;
             } else { 
               type = data.result.type;
             };
-            $(".list .items_show, .list .items_movie").html("");
+            if (page === 1) { 
+              $(".list .items_show, .list .items_movie").html("");
+            };
             $.each(data.result.list, function(index, obj) {
               var watched = false;
               if (type === "show") {
@@ -73,13 +82,14 @@ $(function() { // --------------------------------------------------------------
                 $("#main-browser .tvshowTabShow").removeClass("active");
                 $("#main-browser .movieTabShow").addClass("active");
               };
+              index = ($(".list .items_" + type + " li:last-of-type").data("index") >= 0 ? $(".list .items_" + type + " li:last-of-type").data("index") + 1 : 0);
               $(".list .items_" + type).append('\
                 <li id="' + obj._id + '" class="item' + (watched ? " watched" : "") + '" data-index="' + index + '">\
                   <img class="cover-image" src="' + obj.images.poster + '">\
                   <div class="cover">\
                     <div class="cover-overlay">\
-                      <i class="fa fa-heart actions-favorites tooltipped" data-toggle="tooltip" data-placement="auto bottom" data-delay=\'{ "show": "800", "hide": "100" }\'></i>\
-                      <i class="fa fa-eye actions-watched tooltipped" data-toggle="tooltip" data-placement="auto bottom" data-delay=\'{ "show": "800", "hide": "100" }\'></i>\
+                      <i class="fa fa-heart actions-favorites tooltipped' + (obj.bookmarked ? " selected" : "") + '" data-toggle="tooltip" data-placement="auto bottom" data-delay=\'{ "show": "800", "hide": "100" }\'></i>\
+                      <i class="fa fa-eye actions-watched tooltipped' + (type === "show" ? " hidden" : "") + '" data-toggle="tooltip" data-placement="auto bottom" data-delay=\'{ "show": "800", "hide": "100" }\'></i>\
                     </div>\
                   </div>\
                   <p class="title" title="' + obj.slug + '">' + obj.title + '</p>\
@@ -88,10 +98,11 @@ $(function() { // --------------------------------------------------------------
                 </li>\
               ');
             });
-            $(".list").scrollTop(scroll);
+            page++;
             break;
       
           case "getselection":
+            console.log(data.result);
             switch (view) { 
 
               case "shows-container-contain":
@@ -124,14 +135,15 @@ $(function() { // --------------------------------------------------------------
                           <span>' + obj2.episode + '</span>\
                           <div>' + obj2.title + '</div>\
                         </a>\
-                        <i id="watched-' + key + '-' + obj2.episode + '" class="fa fa-eye watched"></i>\
+                        <i id="watched-' + key + '-' + obj2.episode + '" class="fa fa-eye watched' + (obj2.watched.watched ? " true" : "") + '"></i>\
                       </li>\
                     ');
                   });
                 });
                 $showsContainer.find(".sd-overview .sdoi-title").html(data.result.selectedEpisode.title); 
                 $showsContainer.find(".sd-overview .sdoi-number").html("Season " + data.result.selectedEpisode.season + ", Episode " + data.result.selectedEpisode.episode); 
-                $showsContainer.find(".sd-overview .sdoi-date").html("Aired Date: " + data.result.selectedEpisode.first_aired); 
+                var firstAired = new Date(data.result.selectedEpisode.first_aired * 1000);
+                $showsContainer.find(".sd-overview .sdoi-date").html("Aired Date: " + firstAired.toDateString()); 
                 $showsContainer.find(".sd-overview .sdoi-synopsis").html(data.result.selectedEpisode.overview); 
               
                 $showsContainer.find('.tab-season[data-tab="season-' + data.result.selectedEpisode.season + '"]').addClass("active");
@@ -177,7 +189,7 @@ $(function() { // --------------------------------------------------------------
           case "getloading":
             var $appOverlay = $(".app-overlay");
             $appOverlay.find(".title").html(data.result.title);
-            $appOverlay.find(".buffer_percent").html((data.result.bufferPercent ? data.result.bufferPercent : "100") + "%");
+            $appOverlay.find(".buffer_percent").html(data.result.bufferPercent ? data.result.bufferPercent + "%" : "");
             $appOverlay.find(".download_speed").html(data.result.downloadSpeed);
             $appOverlay.find(".upload_speed").html(data.result.uploadSpeed);
             $appOverlay.find(".value_peers").html(data.result.activePeers);
@@ -231,8 +243,8 @@ $(function() { // --------------------------------------------------------------
         case "app-overlay":
           Popcorn("getloading");
           Popcorn("getselection");
-          $(".spinner, #main-browser .items, #shows-container, #movie-detail").hide();
-          $(".app-overlay").show();
+          //$(".spinner, #main-browser .items, #shows-container, #movie-detail").hide();
+          //$(".app-overlay").show();
           break;
 
         case "notificationWrapper":
@@ -264,8 +276,9 @@ $(function() { // --------------------------------------------------------------
     } else if ($dit.is(".tvshowTabShow")) { 
       Popcorn("showslist");
     };
-    view = "";
-    Popcorn("getviewstack");
+    //view = "";
+    //Popcorn("getviewstack");
+    location.reload(true);
   });
 
   $(".items").on("mouseenter", "li.item", function() {
@@ -304,19 +317,54 @@ $(function() { // --------------------------------------------------------------
     Popcorn("enter");
   });
 
-  $(".list").on("scroll", function () { 
+  $(".app-overlay").on("click", ".cancel-button", function() {
+    Popcorn("back");
+  });
+
+  $(".list").on("scroll", function() { 
     var $dit = $(this);
-    if ($dit.scrollTop() > 0) { 
-      scroll = $dit.scrollTop();
-    };
     if ($dit.scrollTop() + $dit.innerHeight() >= $dit[0].scrollHeight) {
-      view = "";
-      Popcorn("getviewstack");
+      Popcorn("getcurrentlist", [page]);
     };
   });
 
-  $(".app-overlay").on("click", ".cancel-button", function() {
-    Popcorn("back");
+  $("#searchbox").on("keypress", function(event) {
+    var $dit = $(this);
+    if (event.which === 13) {
+      Popcorn("filtersearch", [$dit.val()]);
+      location.reload(true);
+      event.preventDefault();
+    };
+  });
+
+  $("#nav-filters").on("click", ".genres .dropdown-menu a", function() {
+    var $dit = $(this);
+    Popcorn("filtergenre", [$dit.data("value")]);
+    location.reload(true);
+  })
+  .on("click", ".sorters .dropdown-menu a", function() {
+    var $dit = $(this);
+    Popcorn("filtersorter", [$dit.data("value")]);
+    location.reload(true);
+  });
+  
+  $("#torrent_col").on("click", function() {
+    $(".spinner, #main-browser .items, #shows-container, #movie-detail, .app-overlay").hide();
+    $("#torrent-collection-container").show();
+  });
+  $("#startstream").on("click", "button", function() {
+    var $dit = $("#startstream");
+    var args = {};
+    args.imdb_id = $dit.find("imdb_id").val();
+    //args.torrent_url =
+    //args.backdrop =
+    //args.subtitle =
+    //args.selected_subtitle =
+    //args.title =
+    //args.quality =
+    //args.type = 
+    console.log(args);
+    //Popcorn("startstream", args);
   });
 
   function checkConnected(warning) {

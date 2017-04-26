@@ -46,7 +46,8 @@ a {
   opacity: 1;
 }
 
-.shmi-status {
+.shmi-status,
+#nav-filters .sorters .dropdown-menu a {
   text-transform: capitalize;
 }
 
@@ -57,7 +58,8 @@ a {
 #main-browser .items,
 #shows-container,
 #movie-detail,
-.app-overlay {
+.app-overlay,
+#torrent-collection-container {
   display: none;
 }
 
@@ -66,4 +68,8 @@ a {
 
 #playingbar-contents {
   width: 0%;
+}
+
+.items_show .item.watched {
+  display: none;
 }

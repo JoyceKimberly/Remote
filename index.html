@@ -63,11 +63,7 @@
                     <span data-value="" class="value"></span>
                     <span class="caret"></span>
                   </a>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a href="#" data-value=""></a>
-                    </li>
-                  </ul>
+                  <ul class="dropdown-menu"></ul>
                 </li>
                 <li class="dropdown filter sorters">
                   <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -75,11 +71,7 @@
                     <span data-value="" class="value"></span>
                     <span class="caret"></span>
                   </a>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a href="#" data-value=""></a>
-                    </li>
-                  </ul>
+                  <ul class="dropdown-menu"></ul>
                 </li>
               </ul>
 
@@ -99,28 +91,28 @@
                 </li>
 
                 <!-- Watchlist -->
-                <li style="display:block">
+                <li style="display:none">
                   <i id="filterbar-watchlist" class="fa fa-inbox watchlist tooltipped" data-toggle="tooltip" data-placement="bottom" title="Watchlist"></i>
                 </li>
 
                 <!-- Favorites -->
-                <li>
+                <li style="display:none">
                   <i id="filterbar-favorites" class="fa fa-heart favorites tooltipped" data-toggle="tooltip" data-placement="bottom" title="Favorites"></i>
                 </li>
 
                 <!-- Torrent Collection -->
-                <li id="torrent_col" style="display:block">
+                <li id="torrent_col">
                   <i id="filterbar-torrent-collection" class="fa fa-folder-open torrent-collection tooltipped" data-toggle="tooltip" data-placement="bottom"
                     title="Torrent Collection"></i>
                 </li>
 
                 <!-- About -->
-                <li>
+                <li style="display:none">
                   <i id="filterbar-about" class="fa fa-info-circle about tooltipped" data-toggle="tooltip" data-placement="bottom" title="About"></i>
                 </li>
 
                 <!-- Settings -->
-                <li>
+                <li style="display:none">
                   <i id="filterbar-settings" class="fa fa-cog settings tooltipped" data-toggle="tooltip" data-placement="left" title="Settings"></i>
                 </li>
               </ul>
@@ -274,7 +266,61 @@
         </div>
       </div>
       <div id="torrent-collection-container">
-        <div class="torrent-collection"></div>
+        <div class="torrent-collection">
+          <div class="torrent-collection-container">
+            <div class="margintop"></div>
+            <div class="content">
+
+              <div class="onlinesearch">
+                <div class="dropdown online-categories" style="visibility:hidden">
+                  <select name="online-category"><%=select_category%></select>
+                  <div class="dropdown-arrow"></div>
+                </div>
+                <form id="online-form" style="visibility:hidden">
+                  <input id="online-input" autocomplete="off" size="30" type="text" name="keyword" placeholder="Search for torrent">
+                  <i class="fa fa-search online-search"></i>
+                </form>
+                <form id="startstream">
+                  <input id="imdb_id" placeholder="imdb_id" type="text" autocomplete="off">
+                </form>
+              </div>
+
+              <div class="notorrents-info" style="display:none">
+                <div class="notorrents-frame" style="display:none">
+                  <i class="fa fa-download notorrents-icon"></i>
+                  <p class="notorrents-message">Drop Magnet or .torrent</p>
+                </div>
+              </div>
+
+              <div class="torrents-info" style="display:none">
+                <ul class="file-list">
+                  <li class="file-item" data-index="<%=file.index%>" data-file="<%=index%>">
+                    <a><%=file%></a>
+
+                    <div class="item-icon magnet-icon tooltipped" data-toogle="tooltip" data-placement="right" title="Magnet link"></div>
+                    <i class="fa fa-trash-o item-delete tooltipped" data-toggle="tooltip" data-placement="left" title="Remove this
+                      torrent"></i>
+                    <i class="fa fa-pencil item-rename tooltipped" data-toggle="tooltip" data-placement="left" title="Rename this
+                      torrent"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="onlinesearch-info" style="display:none">
+                <i class="fa fa-arrow-circle-left online-back"></i>
+                <ul class="file-list"></ul>
+              </div>
+
+              <div class="collection-actions" style="display:none">
+                <div class="collection-delete fa fa-ban tooltipped" data-toggle="tooltip" data-placement="left" title="Flush entire collection"></div>
+                <div class="collection-open fa fa-folder-open-o tooltipped" data-toggle="tooltip" data-placement="left" title="Open Collection Directory"></div>
+                <div class="collection-import fa fa-level-down tooltipped" data-toggle="tooltip" data-placement="left" title="Import a Torrent"></div>
+                <input class="collection-import-hidden" style="display:none" type="file" accept=".torrent" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="app-overlay">
         <div class="loading">

@@ -7,6 +7,8 @@ var view = "";
 var page = 1;
 
 $(function() { // -----------------------------------------------------------------------
+  isWebAppiOS = (window.navigator.standalone == true);
+  isWebAppChrome = (window.matchMedia('(display-mode: standalone)').matches);
 
   checkConnected(true);
   setInterval(function () {
@@ -114,6 +116,7 @@ $(function() { // --------------------------------------------------------------
                 $showsContainer.find(".shmi-runtime").html(data.result.runtime + " min");
                 $showsContainer.find(".shmi-status").html(data.result.status ? data.result.status : "N/A");
                 $showsContainer.find(".shmi-genre").html(data.result.genres[0]);
+                $showsContainer.find(".shmi-imdb").data("id", data.result.imdb_id);
                 $showsContainer.find(".shmi-rating .number-container-tv").html((data.result.rating.percentage/10) + "/10");
                 $showsContainer.find(".shm-synopsis").html(data.result.synopsis);
 
@@ -163,6 +166,7 @@ $(function() { // --------------------------------------------------------------
                 $.each(data.result.genre, function(index, value) {
                   $movieContainer.find(".genre").append(value + '<span class="divider"> / </span>');
                 });
+                $movieContainer.find(".movie-imdb-link").data("id", data.result.imdb_id);
                 $movieContainer.find(".rating-container .number-container").html(data.result.rating + "/10");
                 $movieContainer.find(".overview").html(data.result.synopsis);
                 if (data.result.watched) {
@@ -311,10 +315,43 @@ $(function() { // --------------------------------------------------------------
   })
   .on("click", ".sdow-watchnow", function() {
     Popcorn("enter");
+  })
+  .on("click", ".fa-eye.watched", function() {
+    Popcorn("togglewatched");
+  })
+  .on("click", ".sdow-quality", function() {
+    Popcorn("togglequality");
+  })
+  .on("click", ".sha-bookmark", function() {
+    Popcorn("togglefavourite");
+  })
+  .on("click", ".fa-times.close-icon", function() {
+    Popcorn("back");
   });
   
   $("#movie-detail").on("click", "#player-chooser", function() {
     Popcorn("enter");
+  })
+  .on("click", ".watched-toggle", function() {
+    Popcorn("togglewatched");
+  })
+  .on("click", ".movie-quality-container", function() {
+    Popcorn("togglequality");
+  })
+  .on("click", ".favourites-toggle", function() {
+    Popcorn("togglefavourite");
+  })
+  .on("click", ".fa-times.close-icon", function() {
+    Popcorn("back");
+  });
+
+  $(".shmi-imdb, .movie-imdb-link").on("click", function() { 
+    var $dit = $(this);
+    if (isWebAppiOS || isWebAppChrome) { 
+      window.open("http://www.imdb.com/title/" + $dit.data("id"), "_self");
+    } else { 
+      window.open("http://www.imdb.com/title/" + $dit.data("id"), "_blank");
+    };
   });
 
   $(".app-overlay").on("click", ".cancel-button", function() {

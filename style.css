@@ -46,6 +46,8 @@ a {
   opacity: 1;
 }
 
+.genre,
+.shmi-genre,
 .shmi-status,
 #nav-filters .sorters .dropdown-menu a {
   text-transform: capitalize;

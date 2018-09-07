@@ -34,12 +34,12 @@ $(function() { // --------------------------------------------------------------
         xhr.setRequestHeader("Authorization", btoa(username + ":" + password));
       },
       success: function(data, textStatus) {
-        console.log(request.method);
         if ( data.error ) { 
+          console.log(request.method);
           console.error(data.error.message);
           return false;
         };
-        console.log(data);
+        //console.log(data);
         switch (request.method) {
 
           case "enter":
@@ -207,6 +207,10 @@ $(function() { // --------------------------------------------------------------
             $appOverlay.find(".value_peers").html(data.result.activePeers);
             $appOverlay.find(".playing-progressbar").css("visibility", "hidden");
             break;
+
+          default:
+            console.log(request.method);
+            console.log(data);
         };
       },
     });
@@ -255,6 +259,7 @@ $(function() { // --------------------------------------------------------------
           break;
       
         case "app-overlay":
+          //Popcorn("listennotifications");
           Popcorn("getloading");
           Popcorn("getselection");
           //$(".spinner, #main-browser .items, #shows-container, #movie-detail").hide();

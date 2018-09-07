@@ -1,4 +1,4 @@
-var ip = "192.168.0.100";
+var ip = "192.168.1.100";
 var port = "8008";
 var username = "popcorn";
 var password = "popcorn";
@@ -22,7 +22,7 @@ $(function() { // --------------------------------------------------------------
 
     var request = {};
     request.params = params;
-    request.id = 10;
+    request.id = 1;
     request.method = method;
     request.jsonrpc = "2.0";
 
@@ -34,6 +34,12 @@ $(function() { // --------------------------------------------------------------
         xhr.setRequestHeader("Authorization", btoa(username + ":" + password));
       },
       success: function(data, textStatus) {
+        console.log(request.method);
+        if ( data.error ) { 
+          console.error(data.error.message);
+          return false;
+        };
+        console.log(data);
         switch (request.method) {
 
           case "enter":
@@ -41,6 +47,7 @@ $(function() { // --------------------------------------------------------------
             break;
       
           case "getviewstack":
+            //console.log(data.result);
             viewstackhandler(data);
             break;
            
@@ -61,7 +68,7 @@ $(function() { // --------------------------------------------------------------
             break;
            
           case "getcurrentlist":
-            console.log(data.result);  
+            //console.log(data);
             var type = "";
             page = (data.result ? data.result.page : 1);
             if (data.result === undefined) {
@@ -104,7 +111,7 @@ $(function() { // --------------------------------------------------------------
             break;
       
           case "getselection":
-            console.log(data.result);
+            //console.log(data);
             switch (view) { 
 
               case "shows-container-contain":
@@ -191,6 +198,7 @@ $(function() { // --------------------------------------------------------------
             break;
 
           case "getloading":
+            //console.log(data);
             var $appOverlay = $(".app-overlay");
             $appOverlay.find(".title").html(data.result.title);
             $appOverlay.find(".buffer_percent").html(data.result.bufferPercent ? data.result.bufferPercent + "%" : "");
@@ -205,14 +213,16 @@ $(function() { // --------------------------------------------------------------
   };
 
   function viewstackhandler(data) {	
+    //console.log(data);
     if (!connected) { return false; };
     if ( typeof(data.result.butterVersion) === "undefined" ) { 
       return false;
     };
-    currentview = data.result.viewstack[data.result.viewstack.length - 1];
+    currentView = data.result.viewstack[data.result.viewstack.length - 1];
+    //console.log(currentView);
 
-    if ( view !== currentview /*&& $("#settings").is(":visible") == false*/ ) { 
-      switch (currentview) {
+    if ( view !== currentView /*&& $("#settings").is(":visible") == false*/ ) { 
+      switch (currentView) {
         
         case "main-browser":
           Popcorn("getcurrentlist");
@@ -256,15 +266,15 @@ $(function() { // --------------------------------------------------------------
         break;
       
         default:
-          console.debug("Current view: " + currentview);
+          console.debug("Current view: " + currentView);
       };
-      view = currentview;
+      view = currentView;
     };
 
-    if (currentview === "app-overlay") { 
+    if (currentView === "app-overlay") { 
       Popcorn("getloading");
     };
-    if (currentview === "player") { 
+    if (currentView === "player") { 
       Popcorn("getplaying");
     };
   };

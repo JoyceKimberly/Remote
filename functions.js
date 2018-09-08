@@ -14,6 +14,7 @@ $(function() { // --------------------------------------------------------------
   setInterval(function () {
     Popcorn("getviewstack");
   }, 1000);
+  //Popcorn("listennotifications");
 
   function Popcorn(method, params) { 
     if ( typeof params === "undefined" ) {
@@ -22,7 +23,7 @@ $(function() { // --------------------------------------------------------------
 
     var request = {};
     request.params = params;
-    request.id = 1;
+    request.id = 10;
     request.method = method;
     request.jsonrpc = "2.0";
 
@@ -35,8 +36,8 @@ $(function() { // --------------------------------------------------------------
       },
       success: function(data, textStatus) {
         if ( data.error ) { 
-          console.log(request.method);
-          console.error(data.error.message);
+          console.error(request.method);
+          console.error(data);
           return false;
         };
         //console.log(data);
@@ -259,7 +260,6 @@ $(function() { // --------------------------------------------------------------
           break;
       
         case "app-overlay":
-          //Popcorn("listennotifications");
           Popcorn("getloading");
           Popcorn("getselection");
           //$(".spinner, #main-browser .items, #shows-container, #movie-detail").hide();
